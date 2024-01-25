@@ -149,6 +149,18 @@ export const fetchProjectItems = async (
                 content {
                   ... on Issue {
                     title
+                    body
+                    comments(first: 20) {
+                      edges {
+                        node {
+                          author {
+                            login
+                            avatarUrl
+                          }
+                          body
+                        }
+                      }
+                    }
                     url
                     issueState: state
                     assignees(first: $assigneesFirst) {
@@ -319,6 +331,11 @@ export class ProjectItem {
   }
   public getBody(): string | undefined {
     return this.node?.content?.body;
+  }
+  public getComments(): { author: string | undefined; body: string | undefined }[] | undefined {
+    return ((this.node?.content?.comments?.edges ?? []) as any[]).map((data) => {
+      return { author: data?.node?.author.login ?? '', body: data?.node?.body ?? '' };
+    });
   }
   public getClosedAt(): string | undefined {
     return this.node?.content?.closedAt;
